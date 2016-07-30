@@ -4,7 +4,7 @@ set -eux
 
 # software install
 sudo apt-get -y update
-INSTALL_SOFTS=(vim git steam openjdk-8-jdk icedtea-netx)
+INSTALL_SOFTS=(vim git steam openjdk-8-jdk icedtea-netx nkf)
 for soft in ${INSTALL_SOFTS[@]}
 do
   sudo apt-get -y install ${soft}
