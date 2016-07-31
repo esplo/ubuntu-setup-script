@@ -76,6 +76,7 @@ git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$H
           done'
 chsh -s /bin/zsh
 cp zpreztorc ~/.zpreztorc
+echo 'EDITOR=vim' >> ~/.zshrc
 echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
 
 # cleanup
