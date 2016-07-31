@@ -4,7 +4,7 @@ set -eux
 
 # software install
 sudo apt-get -y update
-INSTALL_SOFTS=(vim git steam openjdk-8-jdk icedtea-netx nkf)
+INSTALL_SOFTS=(vim git steam openjdk-8-jdk icedtea-netx nkf zsh)
 for soft in ${INSTALL_SOFTS[@]}
 do
   sudo apt-get -y install ${soft}
@@ -64,7 +64,16 @@ Action=org.freedesktop.login1.hibernate;org.freedesktop.login1.handle-hibernate-
 ResultActive=yes
 EOT
 
+# zsh
+git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"
+  zsh -c 'setopt EXTENDED_GLOB &&
+          for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/^README.md(.N); do
+              ln -s "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"
+          done'
+chsh -s /bin/zsh
+cp zpreztorc ~/.zpreztorc
+
+
 # cleanup
 sudo apt-get -y autoremove
-
 
