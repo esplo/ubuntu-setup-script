@@ -3,13 +3,15 @@
 set -eux
 
 # software install
-sudo add-apt-repository ppa:aacebedo/fasd
+sudo add-apt-repository -y ppa:aacebedo/fasd
 sudo apt-get -y update
 INSTALL_SOFTS=(vim git steam openjdk-8-jdk icedtea-netx nkf zsh docker docker-compose fasd)
 for soft in ${INSTALL_SOFTS[@]}
 do
   sudo apt-get -y install ${soft}
 done
+# docker
+sudo usermod -aG docker `whoami`
 
 # # google japanese input
 # sudo apt-get -y install $(check-language-support)
@@ -32,6 +34,7 @@ done
 # sudo apt-get -f -y install
 # sudo dpkg -i dropbox.deb
 # rm dropbox.deb
+# 
 # 
 # # settings
 # dconf reset /org/gnome/settings-daemon/plugins/keyboard/active
