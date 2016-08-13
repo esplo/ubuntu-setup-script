@@ -41,7 +41,7 @@ dconf reset /org/gnome/settings-daemon/plugins/keyboard/active
 dconf write /org/gnome/desktop/input-sources/xkb-options "['ctrl:nocaps']"
 
 # for steam
-echo "LD_PRELOAD='/usr/$LIB/libstdc++.so.6' DISPLAY=:0 steam" > run_steam.sh
+echo "LD_PRELOAD='/usr/$LIB/libstdc++.so.6 /usr/$LIB/libgcc_s.so.1 /usr/$LIB/libxcb.so.1 /usr/$LIB/libgpg-error.so' steam" > run_steam.sh
 chmod 755 run_steam.sh
 
 # folder name
