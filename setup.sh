@@ -5,7 +5,7 @@ set -eux
 # software install
 sudo add-apt-repository -y ppa:aacebedo/fasd
 sudo apt-get -y update
-INSTALL_SOFTS=(vim git steam openjdk-8-jdk icedtea-netx nkf zsh docker docker-compose fasd direnv)
+INSTALL_SOFTS=(vim git steam openjdk-8-jdk icedtea-netx nkf zsh docker docker-compose fasd direnv ubuntu-tweak-tool)
 for soft in ${INSTALL_SOFTS[@]}
 do
   sudo apt-get -y install ${soft}
@@ -78,6 +78,8 @@ chsh -s /bin/zsh
 cp zpreztorc ~/.zpreztorc
 echo 'EDITOR=vim' >> ~/.zshrc
 echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
+
+cp vimrc ~/.vimrc
 
 # cleanup
 sudo apt-get -y autoremove
