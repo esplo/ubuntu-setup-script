@@ -24,11 +24,12 @@ sudo dpkg -i google-chrome*.deb
 # install CLion
 wget https://download.jetbrains.com/cpp/CLion-2016.2.tar.gz
 tar zxvf CLion*.tar.gz
-mkdir -p ~/ide
+mkdir -p ~/ide/clion
 mv clion-*/* ~/ide/clion/
 rm -r clion-*
 
 # install dropbox
+sudo apt-get -y install python-gtk2
 wget https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2015.10.28_amd64.deb -O dropbox.deb
 sudo dpkg -i dropbox.deb
 sudo apt-get -f -y install
@@ -80,6 +81,9 @@ echo 'EDITOR=vim' >> ~/.zshrc
 echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
 
 cp vimrc ~/.vimrc
+
+# key repeat
+xset r rate 200 20
 
 # cleanup
 sudo apt-get -y autoremove
