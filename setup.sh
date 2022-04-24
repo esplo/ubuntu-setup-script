@@ -106,6 +106,15 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/or
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ command 'tilix --quake'
 
 
+# flatpak
+sudo apt -y install flatpak
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+
+# discord
+flatpak install flathub com.discordapp.Discord
+
+
 # sound - Pipewire
 # https://zenn.dev/moru3_48/articles/e50c4ef9b0a5c8
 sudo add-apt-repository ppa:pipewire-debian/pipewire-upstream
@@ -119,8 +128,6 @@ systemctl --user --now enable pipewire{,-pulse}.{socket,service}
 
 # sound - EasyEffects
 # https://gist.github.com/buzztaiki/808f67d3963c3dad19c54a01b12fe0a1
-sudo apt -y install flatpak
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install flathub com.github.wwmm.easyeffects
 
 cat << EOF > ~/.config/autostart/easyeffects-service.desktop
