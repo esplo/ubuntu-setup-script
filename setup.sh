@@ -2,89 +2,156 @@
 
 set -eux
 
-# software install
-sudo add-apt-repository -y ppa:aacebedo/fasd
+NVIDIA_DRIVER_VER=510
+
+
+# nvidia
+sudo apt-get -y --purge remove nvidia-*
+sudo add-apt-repository ppa:graphics-drivers/ppa
+sudo apt -y update
+sudo apt -y install nvidia-driver-${NVIDIA_DRIVER_VER}
+
+
+# apps
 sudo apt-get -y update
-INSTALL_SOFTS=(vim git steam openjdk-8-jdk icedtea-netx nkf zsh docker docker-compose fasd direnv ubuntu-tweak-tool)
-for soft in ${INSTALL_SOFTS[@]}
+INSTALL_APPS=(vim git steam)
+for soft in ${INSTALL_APPS[@]}
 do
   sudo apt-get -y install ${soft}
 done
+
+
 # docker
-sudo usermod -aG docker `whoami`
+sudo apt-get -y install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg    
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get -y update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-# google japanese input
-sudo apt-get -y install $(check-language-support)
+sudo groupadd docker
+sudo usermod -aG docker $USER
 
-# install chrome
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
+
+
+# chrome
 sudo apt-get -y install libxss1 libappindicator1 libindicator7
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-sudo dpkg -i google-chrome*.deb
-
-# install CLion
-wget https://download.jetbrains.com/cpp/CLion-2016.2.tar.gz
-tar zxvf CLion*.tar.gz
-mkdir -p ~/ide/clion
-mv clion-*/* ~/ide/clion/
-rm -r clion-*
-
-# install dropbox
-sudo apt-get -y install python-gtk2
-wget https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2015.10.28_amd64.deb -O dropbox.deb
-sudo dpkg -i dropbox.deb
-sudo apt-get -f -y install
-sudo dpkg -i dropbox.deb
-rm dropbox.deb
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -P /tmp/chrome.deb
+sudo dpkg -i /tmp/chrome.deb
 
 
-# settings
-dconf reset /org/gnome/settings-daemon/plugins/keyboard/active
-dconf write /org/gnome/desktop/input-sources/xkb-options "['ctrl:nocaps']"
-
-# for steam
-echo "LD_PRELOAD='/usr/$LIB/libstdc++.so.6 /usr/$LIB/libgcc_s.so.1 /usr/$LIB/libxcb.so.1 /usr/$LIB/libgpg-error.so' steam" > run_steam.sh
-chmod 755 run_steam.sh
-
-# folder name
-LANG=C xdg-user-dirs-gtk-update
-
-# thunderbird profile
-mkdir -p ~/.thunderbird
-cp -r ./backup_thunderbird/* ~/.thunderbird/
+# dropbox
+cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
+~/.dropbox-dist/dropboxd
 
 
-# mozc
-#  Henkan/Muhenkan 
+# kinto
+/bin/bash -c "$(wget -qO- https://raw.githubusercontent.com/rbreaves/kinto/HEAD/install/linux.sh || curl -fsSL https://raw.githubusercontent.com/rbreaves/kinto/HEAD/install/linux.sh)"
+cp ./kinto.py ~/.config/kinto/kinto.py
 
-# hybernate menu
-cat << EOT | sudo tee -a /etc/polkit-1/localauthority/50-local.d/com.ubuntu.enable-hibernate.pkla
-[Re-enable hibernate by default in upower]
-Identity=unix-user:*
-Action=org.freedesktop.upower.hibernate
-ResultActive=yes
 
-[Re-enable hibernate by default in logind]
-Identity=unix-user:*
-Action=org.freedesktop.login1.hibernate;org.freedesktop.login1.handle-hibernate-key;org.freedesktop.login1;org.freedesktop.login1.hibernate-multiple-sessions;org.freedesktop.login1.hibernate-ignore-inhibit
-ResultActive=yes
-EOT
+# fish
+sudo apt-add-repository ppa:fish-shell/release-3
+sudo apt -y update
+sudo apt -y install fish
+echo /usr/local/bin/fish | sudo tee -a /etc/shells
+chsh -s /usr/local/bin/fish
 
-# zsh
-git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"
-  zsh -c 'setopt EXTENDED_GLOB &&
-          for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/^README.md(.N); do
-              ln -s "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"
-          done'
-chsh -s /bin/zsh
-cp zpreztorc ~/.zpreztorc
-echo 'EDITOR=vim' >> ~/.zshrc
-echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
+curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
+fisher install jethrokuan/fzf
+fisher install jethrokuan/z
 
-cp vimrc ~/.vimrc
+# nvm
+fisher install jorgebucaran/nvm.fish@2.1.0
+nvm install latest
+nvm use latest
 
-# key repeat
-xset r rate 200 20
 
-# cleanup
-sudo apt-get -y autoremove
+# typing
+sudo apt -y install fcitx5-mozc
+im-config -n fcitx5
 
+
+# aws-vault
+sudo curl -L -o /usr/local/bin/aws-vault https://github.com/99designs/aws-vault/releases/latest/download/aws-vault-linux-$(dpkg --print-architecture)
+sudo chmod 755 /usr/local/bin/aws-vault
+
+
+# Lutris
+sudo add-apt-repository ppa:lutris-team/lutris
+sudo apt -y update
+sudo apt -y install lutris
+
+
+# tilix
+sudo apt -y install tilix 
+
+
+# shortcut for tilix
+KEYNAME=custom0
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ name 'Open Tilix'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ binding '<Ctrl>['
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ command 'tilix --quake'
+
+KEYNAME=custom1
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ name 'Open Tilix'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ binding '<Super>['
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ command 'tilix --quake'
+
+
+# sound - Pipewire
+# https://zenn.dev/moru3_48/articles/e50c4ef9b0a5c8
+sudo add-apt-repository ppa:pipewire-debian/pipewire-upstream
+sudo apt -y update
+sudo apt -y pipewire
+sudo apt -y install libspa-0.2-bluetooth
+systemctl --user --now disable  pulseaudio.{socket,service}
+systemctl --user mask pulseaudio
+systemctl --user --now enable pipewire{,-pulse}.{socket,service}
+
+
+# sound - EasyEffects
+# https://gist.github.com/buzztaiki/808f67d3963c3dad19c54a01b12fe0a1
+sudo apt -y install flatpak
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install flathub com.github.wwmm.easyeffects
+
+cat << EOF > ~/.config/autostart/easyeffects-service.desktop
+[Desktop Entry]
+Name=EasyEffects
+Comment=EasyEffects Service
+Exec=easyeffects --gapplication-service
+Icon=easyeffects
+StartupNotify=false
+Terminal=false
+Type=Application
+EOF
+
+gsettings com.github.wwmm.easyeffects process-all-inputs true
+gsettings com.github.wwmm.easyeffects process-all-outputs true
+
+cat << EOF > ~/.config/easyeffects/input/noise-reduction.json
+{
+    "input": {
+        "blocklist": [],
+        "plugins_order": [
+            "rnnoise"
+        ],
+        "rnnoise": {
+            "input-gain": 0.0,
+            "model-path": "",
+            "output-gain": 0.0
+        }
+    }
+}
+EOF
+flatpak run com.github.wwmm.easyeffects -l noise-reduction
+
+### TODO: output plugin
