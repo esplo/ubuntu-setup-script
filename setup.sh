@@ -93,7 +93,7 @@ sudo chmod 755 /usr/local/bin/aws-vault
 # Lutris
 sudo add-apt-repository -y ppa:lutris-team/lutris
 sudo apt -y update
-sudo apt -y install lutris xdelta3
+sudo apt -y install lutris xdelta3 xterm
 
 
 # tilix
@@ -139,3 +139,9 @@ systemctl --user --now enable pipewire{,-pulse}.{socket,service}
 # https://gist.github.com/buzztaiki/808f67d3963c3dad19c54a01b12fe0a1
 flatpak install -y flathub com.github.wwmm.easyeffects
 # TODO: config
+
+
+# grub timeout
+sed -i /etc/default/grub -e 's/GRUB_TIMEOUT=10/GRUB_TIMEOUT=1/g'
+
+
