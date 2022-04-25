@@ -7,7 +7,7 @@ NVIDIA_DRIVER_VER=510
 
 # nvidia
 sudo apt-get -y --purge remove nvidia-*
-sudo add-apt-repository ppa:graphics-drivers/ppa
+sudo add-apt-repository -y ppa:graphics-drivers/ppa
 sudo apt -y update
 sudo apt -y install nvidia-driver-${NVIDIA_DRIVER_VER}
 
@@ -19,6 +19,10 @@ for soft in ${INSTALL_APPS[@]}
 do
   sudo apt-get -y install ${soft}
 done
+
+
+# VS Code
+sudo snap install --classic code
 
 
 # docker
@@ -34,7 +38,8 @@ echo \
 sudo apt-get -y update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-sudo groupadd docker
+# already exists
+# sudo groupadd docker
 sudo usermod -aG docker $USER
 
 sudo systemctl enable docker.service
@@ -43,35 +48,36 @@ sudo systemctl enable containerd.service
 
 # chrome
 sudo apt-get -y install libxss1 libappindicator1 libindicator7
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -P /tmp/chrome.deb
-sudo dpkg -i /tmp/chrome.deb
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -P /tmp/chrome
+sudo dpkg -i /tmp/chrome/*.deb
 
 
 # dropbox
-cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
-~/.dropbox-dist/dropboxd
+sudo apt install -y nautilus-dropbox
 
 
 # kinto
 /bin/bash -c "$(wget -qO- https://raw.githubusercontent.com/rbreaves/kinto/HEAD/install/linux.sh || curl -fsSL https://raw.githubusercontent.com/rbreaves/kinto/HEAD/install/linux.sh)"
+mkdir -p ~/.config/kinto/
 cp ./kinto.py ~/.config/kinto/kinto.py
 
 
 # fish
-sudo apt-add-repository ppa:fish-shell/release-3
+sudo apt-add-repository -y ppa:fish-shell/release-3
 sudo apt -y update
 sudo apt -y install fish
-echo /usr/local/bin/fish | sudo tee -a /etc/shells
-chsh -s /usr/local/bin/fish
+command -v fish | sudo tee -a /etc/shells
+sudo chsh -s $(command -v fish)
 
-curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
-fisher install jethrokuan/fzf
-fisher install jethrokuan/z
+fish -c 'curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher'
+sudo apt -y install fzf
+fish -c 'fisher install jethrokuan/fzf'
+fish -c 'fisher install jethrokuan/z'
 
 # nvm
-fisher install jorgebucaran/nvm.fish@2.1.0
-nvm install latest
-nvm use latest
+fish -c 'fisher install jorgebucaran/nvm.fish@2.1.0'
+fish -c 'nvm install latest'
+fish -c 'nvm use latest'
 
 
 # typing
@@ -85,24 +91,27 @@ sudo chmod 755 /usr/local/bin/aws-vault
 
 
 # Lutris
-sudo add-apt-repository ppa:lutris-team/lutris
+sudo add-apt-repository -y ppa:lutris-team/lutris
 sudo apt -y update
-sudo apt -y install lutris
+sudo apt -y install lutris xdelta3
 
 
 # tilix
-sudo apt -y install tilix 
+sudo apt -y install tilix
+# TODO: settings - global options
 
 
 # shortcut for tilix
-KEYNAME=custom0
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/']"
+
+export KEYNAME=custom0
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ name 'Open Tilix'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ binding '<Ctrl>['
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ binding '<Ctrl>bracketleft'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ command 'tilix --quake'
 
-KEYNAME=custom1
+export KEYNAME=custom1
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ name 'Open Tilix'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ binding '<Super>['
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ binding '<Super>bracketleft'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${KEYNAME}/ command 'tilix --quake'
 
 
@@ -117,9 +126,9 @@ flatpak install flathub com.discordapp.Discord
 
 # sound - Pipewire
 # https://zenn.dev/moru3_48/articles/e50c4ef9b0a5c8
-sudo add-apt-repository ppa:pipewire-debian/pipewire-upstream
+sudo add-apt-repository -y ppa:pipewire-debian/pipewire-upstream
 sudo apt -y update
-sudo apt -y pipewire
+sudo apt -y install pipewire
 sudo apt -y install libspa-0.2-bluetooth
 systemctl --user --now disable  pulseaudio.{socket,service}
 systemctl --user mask pulseaudio
@@ -128,37 +137,5 @@ systemctl --user --now enable pipewire{,-pulse}.{socket,service}
 
 # sound - EasyEffects
 # https://gist.github.com/buzztaiki/808f67d3963c3dad19c54a01b12fe0a1
-flatpak install flathub com.github.wwmm.easyeffects
-
-cat << EOF > ~/.config/autostart/easyeffects-service.desktop
-[Desktop Entry]
-Name=EasyEffects
-Comment=EasyEffects Service
-Exec=easyeffects --gapplication-service
-Icon=easyeffects
-StartupNotify=false
-Terminal=false
-Type=Application
-EOF
-
-gsettings com.github.wwmm.easyeffects process-all-inputs true
-gsettings com.github.wwmm.easyeffects process-all-outputs true
-
-cat << EOF > ~/.config/easyeffects/input/noise-reduction.json
-{
-    "input": {
-        "blocklist": [],
-        "plugins_order": [
-            "rnnoise"
-        ],
-        "rnnoise": {
-            "input-gain": 0.0,
-            "model-path": "",
-            "output-gain": 0.0
-        }
-    }
-}
-EOF
-flatpak run com.github.wwmm.easyeffects -l noise-reduction
-
-### TODO: output plugin
+flatpak install -y flathub com.github.wwmm.easyeffects
+# TODO: config
