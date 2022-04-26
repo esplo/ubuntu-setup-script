@@ -22,8 +22,8 @@ done
 
 
 # VS Code
-sudo snap install --classic code
-
+snap install ubuntu-make --classic
+umake ide visual-studio-code
 
 # docker
 sudo apt-get -y install \
