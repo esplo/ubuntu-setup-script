@@ -149,3 +149,8 @@ sed -i /etc/default/grub -e 's/GRUB_TIMEOUT=10/GRUB_TIMEOUT=1/g'
 gsettings set org.gnome.desktop.session idle-delay 0
 
 
+# rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+sudo apt -y install libssl-dev pkg-config
+fish -c "fish_add_path ${HOME}/.cargo/bin"
+
