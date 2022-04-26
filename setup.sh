@@ -145,3 +145,7 @@ flatpak install -y flathub com.github.wwmm.easyeffects
 sed -i /etc/default/grub -e 's/GRUB_TIMEOUT=10/GRUB_TIMEOUT=1/g'
 
 
+# disable screen blank
+gsettings set org.gnome.desktop.session idle-delay 0
+
+
