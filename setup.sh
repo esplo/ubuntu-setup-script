@@ -74,10 +74,17 @@ sudo apt -y install fzf
 fish -c 'fisher install jethrokuan/fzf'
 fish -c 'fisher install jethrokuan/z'
 
+
+# asdf
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.0
+mkdir -p ~/.config/fish
+echo 'source ~/.asdf/asdf.fish' > ~/.config/fish/config.fish
+mkdir -p ~/.config/fish/completions; and ln -s ~/.asdf/completions/asdf.fish ~/.config/fish/completions
+
 # nvm
-fish -c 'fisher install jorgebucaran/nvm.fish@2.1.0'
-fish -c 'nvm install latest'
-fish -c 'nvm use latest'
+fish -c 'asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git'
+fish -c 'asdf install nodejs latest'
+fish -c 'asdf global nodejs latest'
 
 
 # typing
@@ -88,6 +95,10 @@ im-config -n fcitx5
 # aws-vault
 sudo curl -L -o /usr/local/bin/aws-vault https://github.com/99designs/aws-vault/releases/latest/download/aws-vault-linux-$(dpkg --print-architecture)
 sudo chmod 755 /usr/local/bin/aws-vault
+
+
+# AWS CDK
+fish -c 'npm install -g aws-cdk'
 
 
 # Lutris
