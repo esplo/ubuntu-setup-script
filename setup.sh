@@ -76,10 +76,11 @@ fish -c 'fisher install jethrokuan/z'
 
 
 # asdf
+rm -rf ~/.asdf
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.0
 mkdir -p ~/.config/fish
 echo 'source ~/.asdf/asdf.fish' > ~/.config/fish/config.fish
-mkdir -p ~/.config/fish/completions; and ln -s ~/.asdf/completions/asdf.fish ~/.config/fish/completions
+mkdir -p ~/.config/fish/completions; ln -s ~/.asdf/completions/asdf.fish ~/.config/fish/completions
 
 # nvm
 fish -c 'asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git'
